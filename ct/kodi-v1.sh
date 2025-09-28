@@ -65,8 +65,8 @@ fi
 }
 function select_install_type() {
     INSTALL_TYPE=$(whiptail --title "KODI INSTALLATION TYPE" --radiolist "Choose Installation Type" 12 65 2 \
-    "kodi-install" "Standard Kodi Installation" ON \
-    "kodi-gb-install" "Kodi Great Britain Installation" OFF \
+    "kodi-install" "Kodi XORG" ON \
+    "kodi-gb-install" "Kodi GBM" OFF \
     3>&1 1>&2 2>&3)
     exitstatus=$?
     if [ $exitstatus = 0 ]; then 
