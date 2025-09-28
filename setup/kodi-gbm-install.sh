@@ -113,6 +113,25 @@ alias die='EXIT=$? LINE=$LINENO error_exit'
 set -e
 msg_ok "Installed kodi"
 
+msg_info "Creating Kodi configuration directory"
+mkdir -p /home/kodi/.kodi/userdata
+cat <<EOF >/home/kodi/.kodi/userdata/advancedsettings.xml
+<advancedsettings version="1.0">
+    <loglevel>2</loglevel>  
+    <services>
+        <esallinterfaces>true</esallinterfaces>
+        <webserver>true</webserver>
+        <webserverport>8080</webserverport>
+        <webserverauthentication>true</webserverauthentication>
+        <webserverusername>kodi</webserverusername>
+        <webserverpassword>kodipasswd</webserverpassword>
+        <zeroconf>true</zeroconf>
+    </services>
+</advancedsettings>
+EOF
+chown -R kodi:kodi /home/kodi/.kodi
+msg_ok "Created Kodi configuration directory"
+
 msg_info "Setting up Kodi GBM service"
 cat <<EOF >/etc/systemd/system/kodi-gbm.service
 [Unit]
@@ -124,7 +143,7 @@ Wants=network.target
 User=kodi
 Group=kodi
 Type=simple
-ExecStart=/usr/bin/kodi-standalone --gbm -l /run/kodi/kodi.log
+ExecStart=/usr/bin/kodi --standalone --windowing=gbm --audio-backend=alsa
 Restart=on-abort
 RestartSec=5
 SupplementaryGroups=video render input audio tty systemd-journal
