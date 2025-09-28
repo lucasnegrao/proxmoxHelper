@@ -63,6 +63,21 @@ if [[ $PVE != 1 ]]; then
    exit
 fi
 }
+function select_install_type() {
+    INSTALL_TYPE=$(whiptail --title "KODI INSTALLATION TYPE" --radiolist "Choose Installation Type" 12 65 2 \
+    "kodi-install" "Standard Kodi Installation" ON \
+    "kodi-gb-install" "Kodi Great Britain Installation" OFF \
+    3>&1 1>&2 2>&3)
+    exitstatus=$?
+    if [ $exitstatus = 0 ]; then 
+        echo -e "${DGN}Using Installation Type: ${BGN}$INSTALL_TYPE${CL}"
+        var_install="$INSTALL_TYPE"
+    else
+        clear
+        echo -e "⚠ User exited script \n"
+        exit
+    fi
+}
 function default_settings() {
 		echo -e "${DGN}Using ${var_os} Version: ${BGN}${var_version}${CL}"
 		
@@ -200,6 +215,9 @@ else
 fi
 }
 function start_script() {
+# First, let user select installation type
+select_install_type
+
 if (whiptail --title "SETTINGS" --yesno "Use Default Settings?" --no-button Advanced 10 58); then
   header_info
   echo -e "${BL}Using Default Settings${CL}"
@@ -273,7 +291,7 @@ lxc.idmap: u 0 100000 65536
 EOF
     #TODO internalize code to generate mapping instad of using external python script
     LXC_SUB_CONF=$(python3 -c "$(wget -qLO - https://raw.githubusercontent.com/ddimick/proxmox-lxc-idmapper/master/run.py)" \
-      ${VIDEO_GID}=$(getent group video | cut -d: -f3) ${RENDER_GID}=$(getent group render | cut -d: -f3) ${TTY_GID}=$(getent group tty | cut -d: -f3) ${INPUT_GID}=$(getent group input | cut -d: -f3) ${AUDIO_GID}=$(getent group audio | cut -d: -f3)) 
+      ${VIDEO_GID}=$(getent group video | cut -d: -f3) ${RENDER_GID}=$(getent group render | cut -d: -f3) ${TTY_GID}=$(getent group tty | cut -d: -f3) ${INPUT_GID}=$(getent group input | cut -d: -f3) [...]
     echo "$LXC_SUB_CONF" | grep 'lxc.idmap: g ' >> $LXC_CONFIG
     # on host add rights to map gids but only if they are not already in the file
     echo "$LXC_SUB_CONF" | sed -n '/subgid/,// { /subgid/! p }' | while read line; do cat /etc/subgid | sed 's/[[:blank:]]*//g' | grep -qxF "$line" || echo $line >> /etc/subgid; done
@@ -304,7 +322,7 @@ msg_info "Starting LXC Container"
 pct start $CTID
 msg_ok "Started LXC Container"
 
-lxc-attach -n $CTID -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/mrrudy/proxmoxHelper/main/setup/$var_install.sh)" || exit
+lxc-attach -n $CTID -- bash -c "$(wget -qLO - https://raw.githubusercontent.com/lucasnegrao/proxmoxHelper/dev/setup/$var_install.sh)" || exit
 IP=$(pct exec $CTID ip a s dev eth0 | sed -n '/inet / s/\// /p' | awk '{print $2}')
 pct set $CTID -description "# ${APP} LXC"
 msg_ok "Completed Successfully!\n"
