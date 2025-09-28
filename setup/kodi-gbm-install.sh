@@ -91,6 +91,7 @@ DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common cur
 msg_ok "Installed Dependencies"
 
 msg_info "Adding Kodi PPA"
+apt update
 add-apt-repository -y ppa:ubuntuhandbook1/kodi &>/dev/null
 msg_ok "Added Kodi PPA" 
 msg_info "Setting Up kodi user"
