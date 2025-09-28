@@ -87,6 +87,15 @@ set -e
     
 msg_ok "Set Up Hardware Acceleration"  
 
+msg_info "Installing Dependencies"
+DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common curl sudo gnupg &>/dev/null
+msg_ok "Installed Dependencies"
+
+msg_info "Adding Kodi PPA"
+apt update &>/dev/null
+add-apt-repository -y ppa:ubuntuhandbook1/kodi &>/dev/null
+msg_ok "Added Kodi PPA" 
+
 msg_info "Setting Up kodi user"
 useradd -d /home/kodi -m kodi &>/dev/null
 gpasswd -a kodi audio &>/dev/null
@@ -103,8 +112,6 @@ echo "/usr/sbin/lightdm" > /etc/X11/default-display-manager
 msg_ok "Installed lightdm"
 
 msg_info "Installing kodi"
-# Add PPA for Kodi (ubuntuhandbook1)
-add-apt-repository -y ppa:ubuntuhandbook1/kodi
 apt-get update &>/dev/null
 apt-get install -y kodi &>/dev/null
 set +e
