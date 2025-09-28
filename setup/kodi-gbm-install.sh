@@ -124,14 +124,11 @@ Wants=network.target
 User=kodi
 Group=kodi
 Type=simple
-PAMName=login
-TTYPath=/dev/tty7
-ExecStartPre=/bin/chvt 7
-ExecStart=/usr/bin/kodi-standalone --windowing=gbm
-Restart=always
-RestartSec=15
-KillMode=mixed
-TimeoutStopSec=5
+ExecStart=/usr/bin/kodi-standalone --gbm -l /run/kodi/kodi.log
+Restart=on-abort
+RestartSec=5
+SupplementaryGroups=video render input audio tty systemd-journal
+
 
 [Install]
 WantedBy=multi-user.target
@@ -151,27 +148,6 @@ KERNEL=="controlD[0-9]*", GROUP="render", MODE="0664"
 KERNEL=="renderD[0-9]*", GROUP="render", MODE="0664"
 EOF
 msg_ok "Set up udev rules for input devices"
-
-msg_info "Creating Kodi configuration directory"
-mkdir -p /home/kodi/.kodi/userdata
-cat <<EOF >/home/kodi/.kodi/userdata/guisettings.xml
-<settings version="2">
-    <setting id="system.playlistspath" default="true">special://profile/playlists/</setting>
-    <setting id="filelists.showaddsourcebuttons" default="true">true</setting>
-    <setting id="filelists.showextensions" default="true">true</setting>
-    <setting id="filelists.showparentdiritems" default="true">true</setting>
-    <setting id="filelists.showhidden" default="true">false</setting>
-    <setting id="general.addonupdates" default="true">0</setting>
-    <setting id="general.addonforeignfilter" default="true">false</setting>
-    <setting id="general.addonbrokenfilter" default="true">true</setting>
-    <setting id="videoscreen.screen" default="true">0</setting>
-    <setting id="videoscreen.resolution" default="true">19</setting>
-    <setting id="videoplayer.usevaapi" default="true">true</setting>
-    <setting id="videoplayer.usevdpau" default="true">true</setting>
-</settings>
-EOF
-chown -R kodi:kodi /home/kodi/.kodi
-msg_ok "Created Kodi configuration directory"
 
 msg_info "Enabling Kodi GBM service"
 systemctl daemon-reload
