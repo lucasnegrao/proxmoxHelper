@@ -75,15 +75,10 @@ apt-get install -y sudo &>/dev/null
 apt-get install -y gnupg &>/dev/null
 msg_ok "Installed Dependencies"
 
-msg_info "Setting Up Hardware Acceleration and GBM Support"  
+msg_info "Setting Up Hardware Acceleration"  
 apt-get -y install \
     va-driver-all \
-    ocl-icd-libopencl1 \
-    libgbm1 \
-    libdrm2 \
-    libegl1-mesa \
-    libgl1-mesa-dri \
-    mesa-vulkan-drivers &>/dev/null 
+    ocl-icd-libopencl1 &>/dev/null 
 set +e
 alias die=''
 apt-get install --ignore-missing -y beignet-opencl-icd &>/dev/null
